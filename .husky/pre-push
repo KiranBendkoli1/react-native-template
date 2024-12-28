@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Branch to compare with
+MAIN_BRANCH="main"
+
+# Get the name of the current branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Fetch latest updates from remote
+git fetch origin
+
+# Check if the remote has the MAIN_BRANCH
+if ! git show-ref --verify --quiet refs/remotes/origin/$MAIN_BRANCH; then
+  echo "Remote branch '$MAIN_BRANCH' does not exist. Proceeding with push."
+  exit 0
+fi
+
+# Check if the current branch is behind the main branch
+if ! git merge-base --is-ancestor origin/$MAIN_BRANCH HEAD; then
+  echo "Your branch is not up-to-date with $MAIN_BRANCH."
+  echo "Please pull the latest changes from $MAIN_BRANCH before pushing."
+  exit 1
+fi
+
+echo "Branch is up-to-date with $MAIN_BRANCH. Proceeding with push..."
